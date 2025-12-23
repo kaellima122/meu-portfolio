@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kael | Portfólio de Tecnologia</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Fonte Moderna Sora -->
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- CABEÇALHO / NAVEGAÇÃO -->
+    <header>
+        <nav>
+            <div class="logo">KAEL<span>.</span></div>
+            <ul>
+                
+                <li><a href="#sobre">Sobre Mim</a></li>
+                <li><a href="#projetos">Meus Projetos</a></li>
+                <li><a href="mailto:kaeljunior122@gmail.com">Contato</a></li>
+            </ul>
+             <button class="btn-nav" onclick="window.open('https://wa.me/5551998337286', '_blank')">Fale Comigo</button>
+        </nav>
+    </header>
+
+    <!-- SEÇÃO PRINCIPAL (HERO) -->
+    <main class="hero">
+        <div class="hero-content">
+            <span class="badge">Olá, eu sou o Kael</span>
+            <h1>Projetos de <br><span class="highlight">Tecnologia</span></h1>
+            
+            <p class="description">
+                Interessado em Defesa Cibernética e apaixonado por tecnologia. 
+                Aqui você encontra meus projetos e estudos em desenvolvimento.
+            </p>
+
+            <div class="cta-buttons">
+                <button class="btn-primary" onclick="document.getElementById('projetos').scrollIntoView({behavior: 'smooth'})">Ver Projetos</button>
+                <button class="btn-secondary" onclick="window.open('https://github.com/kaelima122', '_blank')">Meu GitHub</button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Foco</h3>
+                    <p>Cibersegurança</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Estudo</h3>
+                    <p>Redes & TI</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Status</h3>
+                    <p>Em Evolução</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-image">
+            <div class="circle-bg"></div>
+            <!-- Sua foto circular -->
+            <img src="assets/img/kaelfoto.jpeg" alt="Foto de Kael" id="profile-img">
+        </div>
+    </main>
+
+    <!-- SEÇÃO SOBRE MIM (NOVA) -->
+    <section id="sobre" class="about-section">
+        <div class="about-container">
+            <div class="about-text">
+                <h2 class="section-title">Sobre <span>Mim</span></h2>
+                <p>
+                    Sou um perfil <strong>analítico</strong> que encontra satisfação em refletir profundamente sobre problemas para encontrar a solução mais precisa e pontual. Acredito que a <strong>organização</strong> é a base de qualquer projeto de sucesso.
+                </p>
+                <p>
+                    Minha metodologia de trabalho se baseia em ter <strong>referências sólidas</strong> como base. Não me conformo com o estado atual das coisas, mas entendo a importância de respeitar uma lógica inicial e a estratégia, usando-as como alicerce para evoluir e otimizar processos de forma inteligente.
+                </p>
+            </div>
+            <div class="about-qualities">
+                <div class="quality-item"><span>✓</span> Analítico & Reflexivo</div>
+                <div class="quality-item"><span>✓</span> Organizado & Pontual</div>
+                <div class="quality-item"><span>✓</span> Baseado em Estratégia</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO DE PROJETOS -->
+    <section id="projetos" class="projects-section">
+        <h2 class="section-title">Meus <span>Projetos</span></h2>
+        
+        <div class="projects-grid">
+            
+            <!-- PROJETO 1: SITE DO SALÃO -->
+            <div class="project-card">
+                <div class="project-slider">
+                    <div class="slider-wrapper" id="slider" onclick="abrirLightbox()" title="Clique para ampliar">
+                        <!-- Imagens do seu salão (.jpeg conforme sua última mensagem) -->
+                        <img src="assets/img/salao1.jpeg" alt="Slide 1">
+                        <img src="assets/img/salao2.jpeg" alt="Slide 2">
+                        <img src="assets/img/salao3.jpeg" alt="Slide 3">
+                        <img src="assets/img/salao4.jpeg" alt="Slide 4">
+                        <img src="assets/img/salao5.jpeg" alt="Slide 5">
+                        <img src="assets/img/salao6.jpeg" alt="Slide 6">
+                        <img src="assets/img/salao7.jpeg" alt="Slide 7">
+                        <img src="assets/img/salao8.jpeg" alt="Slide 8">
+                        <img src="assets/img/salao9.jpeg" alt="Slide 9">
+                        <img src="assets/img/salao10.jpeg" alt="Slide 10">
+                    </div>
+                    <button class="slider-btn prev" onclick="event.stopPropagation(); moveSlider(-1)">❮</button>
+                    <button class="slider-btn next" onclick="event.stopPropagation(); moveSlider(1)">❯</button>
+                </div>
+                
+                <div class="project-info">
+                    <h3>Landing Page - Salão de Beleza</h3>
+                    <p>Site institucional focado em apresentação de serviços e agendamento.</p>
+                    <div class="project-links">
+                        <a href="https://site-salao-belleza.vercel.app/" target="_blank" class="view-link">Ver Site Online →</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projeto 2: Em Breve -->
+            <div class="project-card placeholder">
+                <div class="img-placeholder">
+                    <span>Em breve</span>
+                </div>
+                <div class="project-info">
+                    <h3>Próximo Projeto</h3>
+                    <p>Estudo focado em Defesa Cibernética e Segurança de Dados.</p>
+                </div>
+            </div>
+
+            <!-- Projeto 3: Em Breve -->
+            <div class="project-card placeholder">
+                <div class="img-placeholder">
+                    <span>Em breve</span>
+                </div>
+                <div class="project-info">
+                    <h3>Próximo Projeto</h3>
+                    <p>Em fase de planejamento e desenvolvimento.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ESTRUTURA DO LIGHTBOX (MODAL TELA CHEIA) -->
+    <div id="lightbox" class="lightbox" onclick="fecharLightbox()">
+        <span class="close-btn">&times;</span>
+        <img id="img-ampliada" src="" alt="Imagem ampliada">
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="script.js"></script>
+</body>
+</html>
