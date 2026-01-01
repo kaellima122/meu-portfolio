@@ -1,100 +1,145 @@
-// Variável global para controlar qual imagem do slider está aparecendo
-let currentIndex = 0;
+/**
+ * Kael Junior Portfolio - Core Engine
+ * Responsabilidades: Gestão de sliders independentes, lightbox sincronizado, 
+ * navegação por teclado e animações de interface.
+ */
 
-document.addEventListener('DOMContentLoaded', () => {
+const Portfolio = {
+    // Cache de Estado e Elementos
+    state: {
+        sliderPositions: [],
+        activeProjectIndex: null,
+    },
     
-    // 1. ANIMAÇÃO DE REVELAÇÃO (STAT CARDS)
-    // Faz os cards de "Foco", "Estudo" e "Status" aparecerem um por um
-    const cards = document.querySelectorAll('.stat-card');
-    
-    cards.forEach((card, index) => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
-        card.style.transition = 'all 0.5s ease-out';
+    elements: {
+        wrappers: null,
+        lightbox: null,
+        imgAmpliada: null,
+        counter: null,
+    },
+
+    // Inicialização do Sistema
+    init() {
+        // Cache de elementos do DOM para performance
+        this.elements.wrappers = document.querySelectorAll('.slider-wrapper');
+        this.elements.lightbox = document.getElementById('lightbox');
+        this.elements.imgAmpliada = document.getElementById('img-ampliada');
+        this.elements.counter = document.getElementById('lb-counter');
+
+        // Inicialização dinâmica: cria uma posição 0 para cada projeto encontrado no HTML
+        this.state.sliderPositions = Array.from(this.elements.wrappers).map(() => 0);
+
+        this.setupAnimations();
+        this.setupEventListeners();
+    },
+
+    // 1. GESTÃO DOS SLIDERS
+    moveSlider(direction, sliderIndex) {
+        const currentWrapper = this.elements.wrappers[sliderIndex];
+        if (!currentWrapper) return;
+
+        const images = currentWrapper.querySelectorAll('img');
+        const totalImages = images.length;
+
+        // Atualiza estado
+        let newPos = this.state.sliderPositions[sliderIndex] + direction;
+
+        // Lógica de Loop
+        if (newPos >= totalImages) newPos = 0;
+        if (newPos < 0) newPos = totalImages - 1;
+
+        this.state.sliderPositions[sliderIndex] = newPos;
+
+        // Aplica Transformação
+        currentWrapper.style.transform = `translateX(${newPos * -100}%)`;
+
+        // Sincroniza com Lightbox se estiver aberto
+        if (this.state.activeProjectIndex === sliderIndex) {
+            this.updateLightboxContent();
+        }
+    },
+
+    // 2. GESTÃO DO LIGHTBOX
+    openLightbox(projectSliderElement) {
+        const allSliders = Array.from(document.querySelectorAll('.project-slider'));
+        this.state.activeProjectIndex = allSliders.indexOf(projectSliderElement);
         
-        setTimeout(() => {
-            card.style.opacity = '1';
-            card.style.transform = 'translateY(0)';
-        }, 200 * (index + 1));
-    });
+        this.updateLightboxContent();
+        
+        this.elements.lightbox.classList.add('active');
+        this.elements.lightbox.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    },
 
-    // 2. ANIMAÇÃO DE REVELAÇÃO DOS PROJETOS (INTERSECTION OBSERVER)
-    // Faz os projetos aparecerem quando você rola a página até eles
-    const projectCards = document.querySelectorAll('.project-card');
-    
-    const observerOptions = {
-        threshold: 0.1
-    };
+    closeLightbox() {
+        this.elements.lightbox.classList.remove('active');
+        this.elements.lightbox.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        this.state.activeProjectIndex = null;
+    },
 
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
+    moveLightbox(direction) {
+        if (this.state.activeProjectIndex !== null) {
+            this.moveSlider(direction, this.state.activeProjectIndex);
+        }
+    },
+
+    updateLightboxContent() {
+        try {
+            const currentWrapper = this.elements.wrappers[this.state.activeProjectIndex];
+            const images = currentWrapper.querySelectorAll('img');
+            const currentIndex = this.state.sliderPositions[this.state.activeProjectIndex];
+            const activeImg = images[currentIndex];
+
+            if (activeImg) {
+                this.elements.imgAmpliada.src = activeImg.src;
+                this.elements.counter.innerText = `${currentIndex + 1} / ${images.length}`;
+            }
+        } catch (error) {
+            console.error("Erro ao atualizar lightbox:", error);
+        }
+    },
+
+    // 3. ANIMAÇÕES (Scroll & Entrada)
+    setupAnimations() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.project-card, .stat-card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            observer.observe(el);
+        });
+    },
+
+    // 4. EVENTOS DE TECLADO
+    setupEventListeners() {
+        document.addEventListener('keydown', (e) => {
+            // Só executa lógica de fechar/navegar se o lightbox estiver ativo (UX Refinada)
+            if (this.state.activeProjectIndex !== null) {
+                if (e.key === "Escape") this.closeLightbox();
+                if (e.key === "ArrowRight") this.moveLightbox(1);
+                if (e.key === "ArrowLeft") this.moveLightbox(-1);
             }
         });
-    }, observerOptions);
-
-    projectCards.forEach(card => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(30px)';
-        card.style.transition = 'all 0.6s ease-out';
-        observer.observe(card);
-    });
-});
-
-// 3. LÓGICA DO SLIDER (CARROSSEL)
-// Move as imagens para a esquerda ou direita
-function moveSlider(direction) {
-    const slider = document.getElementById('slider');
-    const imagens = slider.querySelectorAll('img');
-    const totalImages = imagens.length;
-
-    currentIndex += direction;
-
-    // Loop: se chegar no fim, volta pro começo. Se for pra trás do começo, vai pro fim.
-    if (currentIndex >= totalImages) {
-        currentIndex = 0;
     }
-    if (currentIndex < 0) {
-        currentIndex = totalImages - 1;
-    }
+};
 
-    // Move o container das imagens
-    const offset = currentIndex * -100;
-    slider.style.transform = `translateX(${offset}%)`;
-}
+// Inicializa o objeto assim que o DOM estiver pronto
+document.addEventListener('DOMContentLoaded', () => Portfolio.init());
 
-// 4. LÓGICA DO LIGHTBOX (TELA CHEIA)
-// Abre a imagem que está visível no slider em tamanho grande
-function abrirLightbox() {
-    const slider = document.getElementById('slider');
-    const imagens = slider.querySelectorAll('img');
-    const lightbox = document.getElementById('lightbox');
-    const imgAmpliada = document.getElementById('img-ampliada');
-
-    // Pega o endereço (src) da imagem que o usuário está vendo no momento
-    const srcImagemAtual = imagens[currentIndex].src;
-    
-    imgAmpliada.src = srcImagemAtual;
-    lightbox.style.display = 'flex';
-    
-    // Bloqueia o scroll da página enquanto a foto está aberta
-    document.body.style.overflow = 'hidden';
-}
-
-// Fecha a tela cheia
-function fecharLightbox() {
-    const lightbox = document.getElementById('lightbox');
-    lightbox.style.display = 'none';
-    
-    // Devolve o scroll da página
-    document.body.style.overflow = 'auto';
-}
-
-// Fecha a tela cheia se o usuário apertar a tecla "Esc"
-document.addEventListener('keydown', (e) => {
-    if (e.key === "Escape") {
-        fecharLightbox();
-    }
-});
+/**
+ * MANTENDO COMPATIBILIDADE COM O HTML
+ * Expondo as funções necessárias para os eventos 'onclick' das tags HTML
+ */
+window.moveSlider = (dir, idx) => Portfolio.moveSlider(dir, idx);
+window.abrirLightbox = (el) => Portfolio.openLightbox(el);
+window.fecharLightbox = () => Portfolio.closeLightbox();
+window.moveLightbox = (dir) => Portfolio.moveLightbox(dir);
