@@ -1,16 +1,17 @@
 /**
- * Kael Junior Portfolio - Core Engine
- * Responsabilidades: Gestão de sliders independentes, lightbox sincronizado, 
- * navegação por teclado e animações de interface.
+ * KAEL PORTFOLIO ENGINE
+ * Foco: Integridade da interface, performance e usabilidade.
+ * Este script gerencia a interatividade do portfólio de forma estruturada.
  */
 
 const Portfolio = {
-    // Cache de Estado e Elementos
+    // Estado da Aplicação (Single Source of Truth)
     state: {
-        sliderPositions: [],
-        activeProjectIndex: null,
+        sliderPositions: [],      // Armazena a imagem atual de cada projeto
+        activeProjectIndex: null, // Rastreia qual projeto está aberto no lightbox
     },
     
+    // Referências do DOM
     elements: {
         wrappers: null,
         lightbox: null,
@@ -20,46 +21,45 @@ const Portfolio = {
 
     // Inicialização do Sistema
     init() {
-        // Cache de elementos do DOM para performance
         this.elements.wrappers = document.querySelectorAll('.slider-wrapper');
         this.elements.lightbox = document.getElementById('lightbox');
         this.elements.imgAmpliada = document.getElementById('img-ampliada');
         this.elements.counter = document.getElementById('lb-counter');
 
-        // Inicialização dinâmica: cria uma posição 0 para cada projeto encontrado no HTML
+        // Mapeia os sliders existentes para controle independente
         this.state.sliderPositions = Array.from(this.elements.wrappers).map(() => 0);
 
         this.setupAnimations();
         this.setupEventListeners();
+        console.log("Sistemas de interface inicializados com sucesso.");
     },
 
-    // 1. GESTÃO DOS SLIDERS
+    // --- CONTROLE DE SLIDERS ---
     moveSlider(direction, sliderIndex) {
         const currentWrapper = this.elements.wrappers[sliderIndex];
-        if (!currentWrapper) return;
+        if (!currentWrapper) return; // Silent fail para integridade
 
         const images = currentWrapper.querySelectorAll('img');
         const totalImages = images.length;
 
-        // Atualiza estado
+        // Cálculo da nova posição com lógica de loop
         let newPos = this.state.sliderPositions[sliderIndex] + direction;
 
-        // Lógica de Loop
         if (newPos >= totalImages) newPos = 0;
         if (newPos < 0) newPos = totalImages - 1;
 
         this.state.sliderPositions[sliderIndex] = newPos;
 
-        // Aplica Transformação
+        // Aplicação visual (Transformação CSS para melhor performance)
         currentWrapper.style.transform = `translateX(${newPos * -100}%)`;
 
-        // Sincroniza com Lightbox se estiver aberto
+        // Se o lightbox estiver ativo para este projeto, atualiza a imagem ampliada
         if (this.state.activeProjectIndex === sliderIndex) {
             this.updateLightboxContent();
         }
     },
 
-    // 2. GESTÃO DO LIGHTBOX
+    // --- SISTEMA DE LIGHTBOX (EXPOSIÇÃO DE EVIDÊNCIAS) ---
     openLightbox(projectSliderElement) {
         const allSliders = Array.from(document.querySelectorAll('.project-slider'));
         this.state.activeProjectIndex = allSliders.indexOf(projectSliderElement);
@@ -67,21 +67,13 @@ const Portfolio = {
         this.updateLightboxContent();
         
         this.elements.lightbox.classList.add('active');
-        this.elements.lightbox.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden'; // Trava o scroll do fundo
     },
 
     closeLightbox() {
         this.elements.lightbox.classList.remove('active');
-        this.elements.lightbox.style.display = 'none';
-        document.body.style.overflow = 'auto';
+        document.body.style.overflow = 'auto'; // Libera o scroll
         this.state.activeProjectIndex = null;
-    },
-
-    moveLightbox(direction) {
-        if (this.state.activeProjectIndex !== null) {
-            this.moveSlider(direction, this.state.activeProjectIndex);
-        }
     },
 
     updateLightboxContent() {
@@ -93,53 +85,58 @@ const Portfolio = {
 
             if (activeImg) {
                 this.elements.imgAmpliada.src = activeImg.src;
-                this.elements.counter.innerText = `${currentIndex + 1} / ${images.length}`;
+                this.elements.counter.innerText = `Evidência ${currentIndex + 1} de ${images.length}`;
             }
         } catch (error) {
-            console.error("Erro ao atualizar lightbox:", error);
+            console.error("Erro na atualização do Lightbox:", error);
         }
     },
 
-    // 3. ANIMAÇÕES (Scroll & Entrada)
+    // --- ANIMAÇÕES DE ENTRADA (MÉTODO REATIVO) ---
     setupAnimations() {
+        const observerOptions = { threshold: 0.15 };
+
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
+                    entry.target.classList.add('reveal');
+                    observer.unobserve(entry.target); // Melhora a performance parando de observar
                 }
             });
-        }, { threshold: 0.1 });
+        }, observerOptions);
 
-        document.querySelectorAll('.project-card, .stat-card').forEach(el => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(30px)';
-            el.style.transition = 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+        // Aplica observação em elementos chave
+        document.querySelectorAll('.project-card, .stat-card, .section-title').forEach(el => {
+            el.classList.add('hide-before-reveal'); // Classe inicial via JS para evitar problemas de SEO
             observer.observe(el);
         });
     },
 
-    // 4. EVENTOS DE TECLADO
+    // --- EVENTOS GLOBAIS E ACESSIBILIDADE ---
     setupEventListeners() {
         document.addEventListener('keydown', (e) => {
-            // Só executa lógica de fechar/navegar se o lightbox estiver ativo (UX Refinada)
-            if (this.state.activeProjectIndex !== null) {
-                if (e.key === "Escape") this.closeLightbox();
-                if (e.key === "ArrowRight") this.moveLightbox(1);
-                if (e.key === "ArrowLeft") this.moveLightbox(-1);
-            }
+            if (this.state.activeProjectIndex === null) return;
+
+            const actions = {
+                'Escape': () => this.closeLightbox(),
+                'ArrowRight': () => this.moveSlider(1, this.state.activeProjectIndex),
+                'ArrowLeft': () => this.moveSlider(-1, this.state.activeProjectIndex)
+            };
+
+            if (actions[e.key]) actions[e.key]();
         });
     }
 };
 
-// Inicializa o objeto assim que o DOM estiver pronto
+// Inicialização segura
 document.addEventListener('DOMContentLoaded', () => Portfolio.init());
 
-/**
- * MANTENDO COMPATIBILIDADE COM O HTML
- * Expondo as funções necessárias para os eventos 'onclick' das tags HTML
- */
+// Exportação de funções para compatibilidade com o HTML (onclick)
 window.moveSlider = (dir, idx) => Portfolio.moveSlider(dir, idx);
 window.abrirLightbox = (el) => Portfolio.openLightbox(el);
 window.fecharLightbox = () => Portfolio.closeLightbox();
-window.moveLightbox = (dir) => Portfolio.moveLightbox(dir);
+window.moveLightbox = (dir) => {
+    if (Portfolio.state.activeProjectIndex !== null) {
+        Portfolio.moveSlider(dir, Portfolio.state.activeProjectIndex);
+    }
+};

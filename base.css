@@ -1,0 +1,163 @@
+/* --- Variáveis e Configurações Globais --- */
+:root {
+    --primary: #ff7a00;
+    --primary-glow: rgba(255, 122, 0, 0.3);
+    --bg: #0d0d0d;
+    --card-bg: #161616;
+    --card-border: #222;
+    --text-main: #ffffff;
+    --text-gray: #999;
+    --featured: #e2b714; 
+    --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Sora', sans-serif;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 90px;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--text-main);
+    overflow-x: hidden;
+    line-height: 1.6;
+    /* Reduzido para permitir que o conteúdo chegue mais perto das bordas em telas menores */
+    padding: 0 2%; 
+}
+
+/* --- Layout Container (EXPANDIDO) --- */
+.container-wrapper {
+    /* Aumentado para ocupar mais espaço horizontal */
+    max-width: 1550px; 
+    margin: 0 auto;
+    /* Padding reduzido para focar na largura total */
+    padding: 0 3%;
+}
+
+/* --- NAVBAR --- */
+header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    padding: 20px 0;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(13, 13, 13, 0.7);
+    backdrop-filter: blur(15px);
+    padding: 12px 30px;
+    border-radius: 100px;
+    border: 1px solid var(--card-border);
+}
+
+.logo { font-size: 22px; font-weight: 700; letter-spacing: 1px; }
+.logo span { color: var(--primary); }
+
+nav ul {
+    display: flex;
+    list-style: none;
+    gap: 35px;
+}
+
+nav ul li a {
+    color: var(--text-gray);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+nav ul li a:hover { color: var(--primary); }
+
+.btn-nav {
+    background: var(--primary);
+    border: none;
+    padding: 10px 22px;
+    border-radius: 100px;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-nav:hover { 
+    box-shadow: 0 0 25px var(--primary-glow); 
+    transform: scale(1.05); 
+}
+
+/* --- FOOTER (EXPANDIDO) --- */
+.footer {
+    background-color: var(--card-bg);
+    padding: 80px 0 40px;
+    margin-top: 100px;
+    border-top: 1px solid var(--card-border);
+}
+
+.footer-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 50px;
+    /* Segue a largura do container principal */
+    max-width: 1550px;
+    margin: 0 auto;
+    padding: 0 3%;
+}
+
+.footer-brand p { color: var(--text-gray); font-size: 14px; margin-top: 15px; }
+
+.footer-contact h3 { font-size: 18px; margin-bottom: 20px; }
+.footer-contact ul { list-style: none; }
+.footer-contact ul li { margin-bottom: 12px; }
+.footer-contact ul li a { color: var(--text-gray); text-decoration: none; transition: var(--transition); }
+.footer-contact ul li a:hover { color: var(--primary); }
+
+.footer-bottom { 
+    text-align: center; 
+    margin-top: 60px; 
+    padding-top: 30px; 
+    border-top: 1px solid #222; 
+    color: #444; 
+    font-size: 12px; 
+}
+
+/* --- LIGHTBOX --- */
+.lightbox {
+    display: none; position: fixed; z-index: 9999;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.96); backdrop-filter: blur(15px);
+    justify-content: center; align-items: center;
+}
+.lightbox.active { display: flex; }
+#img-ampliada { max-width: 90%; max-height: 85%; border-radius: 10px; object-fit: contain; }
+
+.lb-nav-btn {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    width: 60px; height: 60px; border-radius: 50%; color: #fff; cursor: pointer; transition: 0.3s;
+    font-size: 24px;
+}
+.lb-nav-btn:hover { background: var(--primary); border-color: var(--primary); }
+.lb-prev { left: 30px; } .lb-next { right: 30px; }
+.close-btn { position: absolute; top: 30px; right: 40px; color: #fff; font-size: 45px; cursor: pointer; }
+
+/* --- CLASSES DE ANIMAÇÃO (PARA O SCRIPT.JS) --- */
+.hide-before-reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.7s cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+.reveal {
+    opacity: 1;
+    transform: translateY(0);
+}
